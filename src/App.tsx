@@ -1,24 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useState } from "react";
+import { Circle } from "./Circle";
 function App() {
+  const [name, setName] = useState<string | any>("anonymous");
+
+  const onChange = (event: React.FormEvent<HTMLInputElement>) => {
+    setName(event.currentTarget.value);
+
+    console.log(event.currentTarget.value);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Circle bgColor="yourwelcome" name={name}></Circle>
+      <form>
+        <input
+          onChange={onChange}
+          type="text"
+          placeholder="your name"
+          name="name"
+          value={name}
+        ></input>
+      </form>
     </div>
   );
 }
