@@ -52,23 +52,6 @@ function Coins() {
     CoinFetcher
   );
 
-  /*
-  const [coins, setCoins] = useState<CoinInterface[]>([]);
-  useEffect(() => {
-    try {
-      (async () => {
-        const Data = await (
-          await fetch(`https://api.coinpaprika.com/v1/coins`)
-        ).json();
-        console.log(Data.slice(0, 100));
-        setCoins(Data.slice(0, 100));
-      })();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
-  */
   return (
     <Container>
       <Header>
