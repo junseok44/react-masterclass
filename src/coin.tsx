@@ -112,7 +112,7 @@ function Coin() {
   return (
     <Container>
       <Header>
-        <Title> {CoinId}</Title>
+        <Title> {state.name ? state.name : CoinId}</Title>
       </Header>
       {AllLoading ? (
         "loading..."
