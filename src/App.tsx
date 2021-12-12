@@ -1,8 +1,8 @@
+import { Helmet } from "react-helmet";
 import { createGlobalStyle } from "styled-components";
 import CoinRouter from "./Router";
 
 const GlobalStyle = createGlobalStyle`
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -50,7 +50,7 @@ table {
 body {
   background-color: ${(props) => props.theme.bgColor};
   padding: 10px;
-  font-family: 'Source Sans Pro','Open Sans', sans-serif; 
+  font-family: 'Raleway', sans-serif;
 
 }
 a {
@@ -63,6 +63,13 @@ a {
 function App() {
   return (
     <>
+      <Helmet>
+        <title>app</title>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap"
+          rel="stylesheet"
+        />
+      </Helmet>
       <GlobalStyle />
       <CoinRouter />
     </>

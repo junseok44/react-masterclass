@@ -13,6 +13,7 @@ import { useQuery } from "react-query";
 import { CoinInfo, CoinPrice } from "./Fetcher";
 import styled from "styled-components";
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 
 interface Paramtype {
   CoinId: string;
@@ -73,25 +74,37 @@ interface PriceData {
   };
 }
 
+const GridContainer = styled.div`
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 30%);
+  grid-template-rows: repeat(auto-fill, minmax(100px, auto));
+  justify-content: center;
+  margin-bottom: 20px;
+  grid-gap: 10px;
+`;
+
 const ColoredItem = styled.div`
-  @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap");
   background-color: ${(props) => props.color};
   padding: 10px;
   font-size: 20px;
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   &:hover {
     opacity: 0.7;
     cursor: pointer;
   }
-  font-family: "Open Sans", sans-serif;
+  color: white;
+  font-family: "Raleway", sans-serif;
 `;
 
 function Coin() {
   const { CoinId } = useParams<Paramtype>();
   // 얘네 둘이 typesciprt 쓰는 형식이 조금 헷갈리는데...시간날때 다시 시험.
-  const { state } = useLocation<{ name: string }>();
   // 하나 거슬리는것은 여기. 지금은 params을 가져다 썼는데, 왜냐하면 state를 쓰니까
   // switch되는 컴포넌트에서 state를 못읽어왓기 때문. 수업에서는 어떻게 했는지?
+
   const isChart = useRouteMatch({ path: `/${CoinId}/Chart` });
   const isPrice = useRouteMatch({ path: `/${CoinId}/Price` });
 
@@ -102,7 +115,10 @@ function Coin() {
 
   const { isLoading: priceLoading, data: priceData } = useQuery<PriceData>(
     ["PriceInfo", CoinId],
-    () => CoinPrice(CoinId)
+    () => CoinPrice(CoinId),
+    {
+      refetchInterval: 3000,
+    }
   );
 
   const AllLoading = infoLoading || priceLoading;
@@ -111,64 +127,120 @@ function Coin() {
 
   return (
     <Container>
+      <Helmet>
+        <title>{CoinId}</title>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap"
+          rel="stylesheet"
+        ></link>
+      </Helmet>
       <Header>
         <Title> {CoinId}</Title>
       </Header>
+
       {AllLoading ? (
         "loading..."
       ) : (
         <>
-          <div
-            style={{
-              margin: "0 auto",
-              display: "grid",
-              gridTemplateColumns: "repeat(3,30%)",
-              gridTemplateRows: "repeat(auto-fill,minmax(100px, auto))",
-              justifyContent: "center",
-              marginBottom: "20px",
-            }}
-          >
-            <ColoredItem color={"#1abc9c"}>{infoData?.name}</ColoredItem>
-            <ColoredItem color={"#9b59b6"}>{infoData?.type}</ColoredItem>
-            <ColoredItem color={"#2980b9"}>rank : {infoData?.rank}</ColoredItem>
-            <ColoredItem
+          <GridContainer>
+            <ColoredItem color={"#1abc9c"}>
+              <div
+                style={{
+                  marginBottom: "10px",
+                  fontSize: "0.8rem",
+                  fontWeight: "700",
+                }}
+              >
+                name
+              </div>
+              <div>{infoData?.name}</div>
+            </ColoredItem>
+            <ColoredItem color={"#9b59b6"}>
+              <div
+                style={{
+                  marginBottom: "10px",
+                  fontSize: "0.8rem",
+                  fontWeight: "700",
+                }}
+              >
+                icons
+              </div>
+              <img
+                src={`https://api.coinicons.net/icon/${infoData?.symbol}/64x64
+                `}
+                alt="coin"
+              ></img>
+            </ColoredItem>
+            <ColoredItem color={"#2980b9"}>
+              <div
+                style={{
+                  marginBottom: "10px",
+                  fontSize: "0.8rem",
+                  fontWeight: "700",
+                }}
+              >
+                quotes
+              </div>
+              <div>{priceData?.quotes.USD.price}</div>
+            </ColoredItem>
+
+            <ColoredItemAll
               color={"#d35400"}
+              upLine="description"
+              bottomLine={infoData?.description}
               style={{
                 gridColumnStart: 1,
                 gridColumnEnd: 4,
                 fontSize: "0.9rem",
               }}
-            >
-              {infoData?.description}
-            </ColoredItem>
+            ></ColoredItemAll>
+
             <ColoredItem
-              color={isDark ? "#ecf0f1" : "#34495e"}
               onClick={() => setDark(!isDark)}
+              color={isDark ? "#34495e" : "#ecf0f1"}
+              style={{ color: isDark ? "white" : "black" }}
             >
-              {isDark ? "light mode" : "dark mode"}
+              <div
+                style={{
+                  marginBottom: "10px",
+                  fontSize: "0.8rem",
+                  fontWeight: "700",
+                }}
+              >
+                mode
+              </div>
+              <div>{isDark ? "dark mode" : "light mode"}</div>
             </ColoredItem>
-            <ColoredItem
+
+            <ColoredItemAll
               color={"#95a5a6"}
               style={{ gridColumnStart: 2, gridColumnEnd: 4 }}
-            >
-              development_status: {infoData?.development_status}
-            </ColoredItem>
+              upLine="development status"
+              bottomLine={infoData?.development_status}
+            ></ColoredItemAll>
+
             <Link to={`/`}>
-              <ColoredItem color={"#3498db"} style={{ marginTop: "10px" }}>
-                Home
-              </ColoredItem>
+              <ColoredItemAll color={"#3498db"} upLine="Home"></ColoredItemAll>
             </Link>
             <Link to={`/${CoinId}/Chart`}>
-              <ColoredItem color={"#1abc9c"} style={{ marginTop: "10px" }}>
-                show Chart
-              </ColoredItem>
+              <ColoredItemAll
+                color={"#1abc9c"}
+                upLine="show Chart"
+                style={{
+                  color: isChart !== null ? "red" : "white",
+                }}
+              ></ColoredItemAll>
             </Link>
             <Link to={`/${CoinId}/Price`}>
-              <ColoredItem color={"#8e44ad"} style={{ marginTop: "10px" }}>
-                show Price
-              </ColoredItem>
+              <ColoredItemAll
+                color={"#8e44ad"}
+                upLine="show Price"
+                style={{
+                  color: isPrice !== null ? "red" : "white",
+                }}
+              ></ColoredItemAll>
             </Link>
-          </div>
+          </GridContainer>
 
           <Switch>
             <Route path={`/${CoinId}/Chart`}>
@@ -181,6 +253,32 @@ function Coin() {
         </>
       )}
     </Container>
+  );
+}
+
+function ColoredItemAll({
+  color,
+  upLine,
+  bottomLine,
+  style,
+  onClick,
+}: {
+  color: string;
+  upLine?: string;
+  bottomLine?: string | undefined;
+  style?: object;
+  onClick?: Function;
+  children?: undefined;
+}) {
+  return (
+    <ColoredItem color={color} style={style} onClick={() => onClick}>
+      <div
+        style={{ marginBottom: "10px", fontSize: "0.8rem", fontWeight: "700" }}
+      >
+        {upLine}
+      </div>
+      <div style={{ textAlign: "right" }}>{bottomLine}</div>
+    </ColoredItem>
   );
 }
 
