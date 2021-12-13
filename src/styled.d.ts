@@ -1,6 +1,5 @@
 import "styled-components";
-
-// declare custom declaration file.
+// 이건 왜 필요한거지?
 declare module "styled-components" {
   export interface DefaultTheme {
     bgColor: string;
