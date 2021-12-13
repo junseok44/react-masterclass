@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet";
-import { createGlobalStyle } from "styled-components";
+import { atom, useRecoilState } from "recoil";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
+import { isDarkAtom } from "./Atom";
 import CoinRouter from "./Router";
+import { darkTheme, lightTheme } from "./Themes";
 
 const GlobalStyle = createGlobalStyle`
 
@@ -61,17 +65,21 @@ a {
 `;
 
 function App() {
+  const [isDark, setisDark] = useRecoilState(isDarkAtom);
+
   return (
     <>
-      <Helmet>
-        <title>app</title>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap"
-          rel="stylesheet"
-        />
-      </Helmet>
-      <GlobalStyle />
-      <CoinRouter />
+      <ThemeProvider theme={isDark ? lightTheme : darkTheme}>
+        <Helmet>
+          <title>app</title>
+          <link
+            href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap"
+            rel="stylesheet"
+          />
+        </Helmet>
+        <GlobalStyle />
+        <CoinRouter />
+      </ThemeProvider>
     </>
   );
 }

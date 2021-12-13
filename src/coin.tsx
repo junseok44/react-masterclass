@@ -15,10 +15,6 @@ import styled from "styled-components";
 import { useState } from "react";
 import { Helmet } from "react-helmet";
 
-interface Paramtype {
-  CoinId: string;
-}
-
 interface InfoData {
   id: string;
   name: string;
@@ -100,7 +96,7 @@ const ColoredItem = styled.div`
 `;
 
 function Coin() {
-  const { CoinId } = useParams<Paramtype>();
+  const { CoinId } = useParams<{ CoinId: string }>();
   // 얘네 둘이 typesciprt 쓰는 형식이 조금 헷갈리는데...시간날때 다시 시험.
   // 하나 거슬리는것은 여기. 지금은 params을 가져다 썼는데, 왜냐하면 state를 쓰니까
   // switch되는 컴포넌트에서 state를 못읽어왓기 때문. 수업에서는 어떻게 했는지?
@@ -181,7 +177,9 @@ function Coin() {
               >
                 quotes
               </div>
-              <div>{priceData?.quotes.USD.price}</div>
+              {priceData?.quotes ? (
+                <div>{priceData.quotes.USD.price}</div>
+              ) : null}
             </ColoredItem>
 
             <ColoredItemAll

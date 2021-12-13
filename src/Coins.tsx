@@ -1,6 +1,8 @@
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { isDarkAtom } from "./Atom";
 import { CoinFetcher } from "./Fetcher";
 
 export const Title = styled.h1`
@@ -52,11 +54,15 @@ function Coins() {
     CoinFetcher
   );
 
+  const [isDark, setisDark] = useRecoilState(isDarkAtom);
+
   return (
     <Container>
       <Header>
-        <Title>Coins</Title>
+        <Title>lightmode {isDark.toString()}</Title>
+        <button onClick={() => setisDark((current) => !current)}>hello</button>
       </Header>
+
       <CoinList>
         {isLoading
           ? isLoading
