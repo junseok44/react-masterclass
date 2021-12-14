@@ -1,26 +1,32 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { atom, useRecoilState, useSetRecoilState } from "recoil";
+import { GlobalStyle } from "./GlobalStyle";
+import ToDoList from "./ToDoList";
+
+// 에러 메시지를 paint 해주고 싶은데요.. errors["key"].message 요런식으로. 근데 안되더라고.
+// function errorPaint() {
+//   const newArray = [];
+//   for (var name in errors) {
+//     newArray.push(errors[name]?.message);
+//   }
+//   console.log(newArray);
+//   setErrorMsg(newArray);
+// }
+
+// <
+//   {
+//     text: string;
+//     id: number;
+//     category: "TO_DO" | "TO_DO_NOW" | "TO_DO_TMR";
+//   }[]
+// >
 
 function App() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
-
-  console.log(watch());
-
-  const onSubmit = () => {
-    console.log("hello");
-  };
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <input {...register("name")}></input>
-        <input {...register("email")}></input>
-        <button type="submit">submit</button>
-        {/* {errors.name?.type === "required" && "more then 10"} */}
-      </form>
+      <GlobalStyle />
+      <ToDoList></ToDoList>
     </>
   );
 }
