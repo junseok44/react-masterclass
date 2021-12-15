@@ -7,3 +7,8 @@
 atom이 무언가를 반환하기 때문인가. default로 [] 이걸 반환하고, 그 안에 들어가는것을 정의해주어야 하는건가
 
 [] {coinId} 이게 잘 안되니까요.
+
+[] localstorage에 toDo 저장하기
+[] 사용자 custom category를 만들기.
+
+[] 그런데요.. 여전히 enum 사용법은 잘 모르겠고 typescript도.. 한번 정리가 필요할듯.
