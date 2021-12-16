@@ -1,67 +1,33 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import {
-  categoryState,
-  categoryStorage,
-  IToDo,
-  todoSelector,
-  toDoState,
-} from "./atoms";
-import CreateToDo from "./Components/CreateToDos";
-import ToDo from "./Components/ToDo";
+import { minutesAtom, selectorAtom } from "./atoms";
 
-// export enum CategoryType {
-//   "TO_DO" = "TO_DO",
-//   "DOING" = "DOING",
-//   "DONE" = "DONE",
-// }
+export function ToDoList() {
+  const [minutes, setMinutes] = useRecoilState(minutesAtom);
+  const [translatedHours, setHours] = useRecoilState(selectorAtom);
 
-function ToDoList() {
-  const [toDos, setToDos] = useRecoilState(toDoState);
-  const [category, setCategory] = useRecoilState(categoryState);
-  const categorizdToDos = useRecoilValue(todoSelector);
-  const [categoryStore, storeCategory] = useRecoilState(categoryStorage);
+  const changeMinutes = (event: React.FormEvent<HTMLInputElement>) => {
+    setMinutes(+event.currentTarget.value);
+  };
 
-  useEffect(() => {
-    console.log(toDos);
-  }, [toDos]);
-
-  useEffect(() => {
-    const toDoData: any = localStorage.getItem("toDos");
-    const categoryData: any = localStorage.getItem("categories");
-    const JsonCategories: string[] = JSON.parse(categoryData);
-    const JsonTodoData: IToDo[] = JSON.parse(toDoData);
-    storeCategory(JsonCategories);
-    setToDos(JsonTodoData);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("toDos", JSON.stringify(toDos));
-    localStorage.setItem("categories", JSON.stringify(categoryStore));
-  }, [toDos, categoryStore]);
-
-  const handleInput = (event: React.FormEvent<HTMLSelectElement>) => {
-    const {
-      currentTarget: { value },
-    } = event;
-    console.log(value);
-    setCategory(value as any);
+  const setHoursFunction = (event: React.FormEvent<HTMLInputElement>) => {
+    setHours(+event.currentTarget.value);
   };
   return (
-    <div>
-      current category : {category}
-      <select onInput={handleInput}>
-        {categoryStore.map((category, index) => {
-          return <option key={index}>{category}</option>;
-        })}
-      </select>
-      <CreateToDo />
-      <ul>
-        {categorizdToDos.map((item) => {
-          return <ToDo key={item.id} {...item}></ToDo>;
-        })}
-      </ul>
-    </div>
+    <>
+      <input
+        value={minutes}
+        onChange={changeMinutes}
+        type="text"
+        placeholder="minute"
+      ></input>
+      <input
+        value={translatedHours}
+        onChange={setHoursFunction}
+        type="text"
+        placeholder="hours"
+      ></input>
+    </>
   );
 }
 
