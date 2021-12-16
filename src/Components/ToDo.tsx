@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { IToDo, toDoState } from "../atoms";
+import { categoryStorage, IToDo, toDoState } from "../atoms";
 
 function ToDo({ text, category, id }: IToDo) {
   const toDos = useRecoilValue(toDoState);
   const setTodos = useSetRecoilState(toDoState);
   // 예전에 velopert 씨는 배열을 어떻게 수정했떠라.
+  const categoryList = useRecoilValue(categoryStorage);
 
   const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const { name } = event.currentTarget; // 이 name의 타입을 지정해주느방법은?
@@ -38,24 +39,17 @@ function ToDo({ text, category, id }: IToDo) {
 
   return (
     <li>
-      <span>
-        {text} : {category}
-      </span>
-      {category !== "TO_DO" && (
-        <button onClick={onClick} name="TO_DO">
-          TO DO
-        </button>
-      )}
-      {category !== "DOING" && (
-        <button onClick={onClick} name="DOING">
-          DOING
-        </button>
-      )}
-      {category !== "DONE" && (
-        <button onClick={onClick} name="DONE">
-          done
-        </button>
-      )}
+      <span>{text} : </span>
+      <span style={{ color: "Red" }}>{category}</span>
+      {categoryList.map((categoryItem) => {
+        if (category !== categoryItem) {
+          return (
+            <button onClick={onClick} name={categoryItem}>
+              {categoryItem}
+            </button>
+          );
+        }
+      })}
     </li>
   );
 }

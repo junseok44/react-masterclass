@@ -10,11 +10,11 @@ import {
 import CreateToDo from "./Components/CreateToDos";
 import ToDo from "./Components/ToDo";
 
-export enum CategoryType {
-  "TO_DO" = "TO_DO",
-  "DOING" = "DOING",
-  "DONE" = "DONE",
-}
+// export enum CategoryType {
+//   "TO_DO" = "TO_DO",
+//   "DOING" = "DOING",
+//   "DONE" = "DONE",
+// }
 
 function ToDoList() {
   const [toDos, setToDos] = useRecoilState(toDoState);
