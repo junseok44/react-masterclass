@@ -1,21 +1,14 @@
-import { atom, selector } from "recoil";
+import { atom } from "recoil";
 
-export const minutesAtom = atom<number>({
-  key: "minutes",
-  default: 0,
-});
+export interface ItoDos {
+  [key: string]: string[];
+}
 
-export const selectorAtom = selector<number>({
-  key: "selector",
-  get: ({ get }) => {
-    const minutes = get(minutesAtom);
-    return minutes / 60;
-  },
-  set: ({ set, get }, newValue) => {
-    const minutes = get(minutesAtom);
-
-    const newMinutes = Number(newValue) * 60;
-
-    set(minutesAtom, newMinutes);
+export const todoAtoms = atom<ItoDos>({
+  key: "toDo",
+  default: {
+    TO_DO: ["A", "B", "C", "D", "E"],
+    DOING: ["아", "내일", "친구", "전역이라고?"],
+    DONE: ["시간", "존나", "빨리가네", "시발"],
   },
 });

@@ -46,7 +46,7 @@ table {
 	border-spacing: 0;
 }
 body {
-  background-color: ${(props) => props.theme?.bgColor}
+  background-color:#c9deff;
   padding: 10px;
   font-family: 'Raleway', sans-serif;
 

@@ -13,7 +13,6 @@ atom이 무언가를 반환하기 때문인가. default로 [] 이걸 반환하�
 
 [] 그런데요.. 여전히 enum 사용법은 잘 모르겠고 typescript도.. 한번 정리가 필요할듯.
 
-[] 그리고 버튼 추가하는것을 깜빡했ㄲㄴㄴ데.
-
-[] 중복 없애주기
-dfdf
+[] typescript
+[] react-beautiful-dnd
+[]
