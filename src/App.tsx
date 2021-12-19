@@ -10,26 +10,11 @@ import { useRecoilState } from "recoil";
 import { todoAtoms } from "./atoms";
 import { DropDivCard } from "./Components/DropDivCard";
 
-export const DropDiv = styled.div`
-  width: 200px;
-  padding: 10px;
-  margin: 10px 10px;
-  background-color: #dcdee0;
-  border-radius: 15px;
-`;
-
 export const Title = styled.div`
   font-size: 1.5rem;
   text-align: center;
-  margin-bottom: 10px;
+  margin: 10px 0px;
   font-weight: 600;
-`;
-
-export const DropItem = styled.li`
-  margin-bottom: 10px;
-  padding: 5px 10px;
-  border-radius: 15px;
-  background-color: white;
 `;
 
 export const DropWrapper = styled.div`
@@ -71,14 +56,10 @@ function App() {
 
       settoDos((currentObj) => {
         const copyArr = [...currentObj[startName]];
+        const copyArr2 = [...currentObj[endName]];
         copyArr.splice(source.index, 1);
-        return { ...currentObj, [startName]: copyArr };
-      });
-
-      settoDos((currentObj) => {
-        const copyArr = [...currentObj[endName]];
-        copyArr.splice(destination.index, 0, draggableId);
-        return { ...currentObj, [endName]: copyArr };
+        copyArr2.splice(destination.index, 0, draggableId);
+        return { ...currentObj, [startName]: copyArr, [endName]: copyArr2 };
       });
     }
   };

@@ -1,6 +1,17 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
-import { DropItem } from "../App";
+import styled from "styled-components";
+
+export const DropItem = styled.div<{
+  isDragging: boolean;
+  draggingOver: string | undefined;
+}>`
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 15px;
+  background-color: white;
+  color: ${(props) => (props.draggingOver ? "red" : "black")};
+`;
 
 export function DraggableCompo({
   todo,
@@ -11,8 +22,10 @@ export function DraggableCompo({
 }) {
   return (
     <Draggable key={todo} draggableId={todo} index={index}>
-      {(magic) => (
+      {(magic, snapshot) => (
         <DropItem
+          isDragging={snapshot.isDragging}
+          draggingOver={snapshot.draggingOver}
           ref={magic.innerRef}
           {...magic.draggableProps}
           {...magic.dragHandleProps}

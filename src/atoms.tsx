@@ -9,6 +9,6 @@ export const todoAtoms = atom<ItoDos>({
   default: {
     TO_DO: ["A", "B", "C", "D", "E"],
     DOING: ["아", "내일", "친구", "전역이라고?"],
-    DONE: ["시간", "존나", "빨리가네", "시발"],
+    DONE: ["시간", "존나", "빨리가네"],
   },
 });
