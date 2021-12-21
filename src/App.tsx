@@ -1,6 +1,9 @@
 import { GlobalStyle } from "./GlobalStyle";
 import {
   DragDropContext,
+  Droppable,
+  DroppableProps,
+  DroppableProvidedProps,
   DropResult,
   ResponderProvided,
 } from "react-beautiful-dnd";
@@ -8,7 +11,8 @@ import styled from "styled-components";
 import { Helmet } from "react-helmet";
 import { useRecoilState } from "recoil";
 import { todoAtoms } from "./atoms";
-import { DropDivCard } from "./Components/DropDivCard";
+import DropDivCard from "./Components/DropDivCard";
+import { useEffect } from "react";
 
 export const Title = styled.div`
   font-size: 1.5rem;
@@ -22,6 +26,25 @@ export const DropWrapper = styled.div`
   justify-content: center;
 `;
 
+export const DropBox = styled.div`
+  position: fixed;
+  bottom: 5%;
+  left: 25%;
+  width: 50%;
+  background-color: #dcdee0;
+`;
+
+export const DropBoxItem = styled.div<{
+  droppableProps: DroppableProvidedProps;
+  draggingOverWith: string | undefined;
+}>`
+  background-color: ${(props) =>
+    props.draggingOverWith ? "#fab1a0" : "transparent"};
+
+  text-align: center;
+  min-height: 100px;
+`;
+
 function App() {
   const [toDos, settoDos] = useRecoilState(todoAtoms);
 
@@ -29,6 +52,19 @@ function App() {
     console.log(args);
 
     const { source, destination, draggableId } = args;
+
+    console.log(destination?.droppableId, draggableId);
+
+    if (destination?.droppableId === "trash") {
+      settoDos((currentObj) => {
+        const currentArr = [...currentObj[source.droppableId]];
+        currentArr.splice(source.index, 1);
+
+        return { ...currentObj, [source.droppableId]: currentArr };
+      });
+
+      return;
+    }
 
     if (source.droppableId === destination?.droppableId) {
       settoDos((currentObj) => {
@@ -40,7 +76,10 @@ function App() {
         // 그래서 copyObj의 안에 value를 다시 복사해서 만들었어요
         // 아니 근데 그러면 copyObj 만들어서 할 필요가 없다고 한다. nico의 코딩에 따르면.
         copyArr.splice(source.index, 1);
-        copyArr.splice(destination.index, 0, draggableId);
+        copyArr.splice(destination.index, 0, {
+          text: draggableId,
+          id: Date.now(),
+        });
 
         return { ...currentObj, [destName]: copyArr };
       });
@@ -58,11 +97,27 @@ function App() {
         const copyArr = [...currentObj[startName]];
         const copyArr2 = [...currentObj[endName]];
         copyArr.splice(source.index, 1);
-        copyArr2.splice(destination.index, 0, draggableId);
+        copyArr2.splice(destination.index, 0, {
+          text: draggableId,
+          id: Date.now(),
+        });
         return { ...currentObj, [startName]: copyArr, [endName]: copyArr2 };
       });
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem("thisisTOdoS", JSON.stringify(toDos));
+  }, [toDos]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = localStorage.getItem("thisisTOdos");
+      const parsedData = await JSON.parse(data || "");
+      settoDos(parsedData);
+      console.log("loaded");
+    }
+  }, []);
 
   return (
     <>
@@ -89,6 +144,21 @@ function App() {
             );
           })}
         </DropWrapper>
+        <DropBox>
+          <Title>Trashcan</Title>
+          <Droppable droppableId="trash">
+            {(provided, snapshot) => (
+              <DropBoxItem
+                ref={provided.innerRef}
+                droppableProps={provided.droppableProps}
+                draggingOverWith={snapshot.draggingOverWith}
+              >
+                drop here to remove
+                {provided.placeholder}
+              </DropBoxItem>
+            )}
+          </Droppable>
+        </DropBox>
       </DragDropContext>
     </>
   );

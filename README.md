@@ -15,4 +15,7 @@ atom이 무언가를 반환하기 때문인가. default로 [] 이걸 반환하�
 
 [] typescript
 [] react-beautiful-dnd
-[]
+[] react-hook-form
+[] recoil
+
+[] board 옮기기. localstorage 저장하기.

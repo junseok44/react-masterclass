@@ -1,10 +1,11 @@
 import { Title } from "../App";
 import { Droppable } from "react-beautiful-dnd";
 import DraggableCompo from "./DraggableCard";
-import { ItoDos } from "../atoms";
+import { Item, ItoDos, todoAtoms } from "../atoms";
 import styled from "styled-components";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 const ColoredUl = styled.ul<{
   isDraggingOver: boolean;
@@ -12,7 +13,7 @@ const ColoredUl = styled.ul<{
   draggingFromThisWith: string | undefined;
 }>`
   width: 90%;
-  minheight: "300px";
+  flex-grow: 1;
   padding: 10px;
   background-color: ${(props) =>
     props.draggingFromThisWith
@@ -21,12 +22,33 @@ const ColoredUl = styled.ul<{
       ? "#74b9ff"
       : "transparent"};
 `;
+
+const Form = styled.form`
+  width: 100%;
+  input {
+    width: 90%;
+  }
+  text-align: center;
+`;
 const ColoredInput = styled.input`
   all: unset;
   text-align: center;
   background-color: white;
-  width: 90%;
+  margin-bottom: 10px;
+  border-radius: 10px;
 `;
+
+const ColoredButton = styled.button`
+  all: unset;
+  background-color: white;
+  padding: 3px 10px;
+  border-radius: 10px;
+  pointer: cursor;
+  &:hover {
+    font-weight: 700;
+  }
+`;
+
 const DropDiv = styled.div`
   width: 200px;
   margin: 10px 10px;
@@ -37,47 +59,52 @@ const DropDiv = styled.div`
   align-items: center;
 `;
 
-interface ItoDO {
-  TO_DO?: string;
-  DOING?: string;
-  DONE?: string;
-}
-
-export function DropDivCard({
+function DropDivCard({
   title,
   category,
   toDos,
   index,
 }: {
   title: string;
-  category: string[];
+  category: Item[];
   toDos: ItoDos;
   index: number;
 }) {
-  const { register, handleSubmit, setValue, watch } = useForm();
-  // form 쓰는부분 막힘 다시 해야함..
-  const inputElement = useRef<HTMLInputElement>(null);
+  const [_, settoDos] = useRecoilState(todoAtoms);
 
-  const onSubmit = (data: ItoDO) => {
-    console.log("confirmed");
-    console.log(data);
+  const { register, handleSubmit, setValue } = useForm();
+
+  const boardName = Object.keys(toDos)[index];
+
+  const onSubmit = (data: { [key: string]: string }) => {
+    const keys = Object.keys(data)[0];
+    const values = Object.values(data)[0];
+    const newObj = { id: Date.now(), text: values };
+
+    settoDos((currentObj) => {
+      const categoryArr = [...currentObj[keys]];
+      categoryArr.push(newObj);
+
+      return { ...currentObj, [keys]: [...categoryArr] };
+    });
+
+    setValue(`${boardName}`, "");
   };
 
   return (
     <>
       <DropDiv>
         <Title>{title}</Title>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <input
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <ColoredInput
             type="text"
-            {...register(`${Object.keys(toDos)[index]}`, { required: true })}
-            ref={inputElement}
-            placeholder={`write  ` + Object.keys(toDos)[index]}
-          ></input>
-          <button type="submit">click here</button>
-        </form>
+            {...register(`${boardName}`, { required: true })}
+            placeholder={`type a ${boardName}`}
+          ></ColoredInput>
+          <ColoredButton type="submit">submit</ColoredButton>
+        </Form>
 
-        <Droppable droppableId={Object.keys(toDos)[index]}>
+        <Droppable droppableId={boardName}>
           {(magic, snapshot) => (
             <ColoredUl
               ref={magic.innerRef}
@@ -90,8 +117,10 @@ export function DropDivCard({
                 return (
                   <DraggableCompo
                     key={index}
+                    boardName={boardName}
                     index={index}
-                    todo={item}
+                    todo={item.text}
+                    toDos={toDos}
                   ></DraggableCompo>
                 );
               })}
@@ -103,3 +132,5 @@ export function DropDivCard({
     </>
   );
 }
+
+export default React.memo(DropDivCard);
