@@ -19,3 +19,24 @@ atom이 무언가를 반환하기 때문인가. default로 [] 이걸 반환하�
 [] recoil
 
 [] board 옮기기. localstorage 저장하기.
+
+[] 고쳐야할 것 2가지
+
+1. 일단 이 보드 자체가 메차쿠차임.
+   보드를 drop하는 부분이 되어야 하는데,
+   가까이 가져가면, TODO BOARD가 이걸 잡아끌어버리니까.
+
+2. 그리고 console에서 index가 2가 되어버리는데
+   이것도 해결해야함.
+
+3. 만약 올바른 index를 받았다고 할때 무엇을 해야하는가
+
+일단, toDo atom 안에 있는 key들의 배열순서를 조정해서
+렌더링이 다시 일어나도록 해야함
+
+객체 안에 있는 key들을 index에 따라서 재 배열할 수 있나?
+
+예를 들어 source.index거의 key를 지우고,
+dest.index의 key 부분에 object key를 삽입할 수 있냐
+
+이건 map을 써야하는건가.

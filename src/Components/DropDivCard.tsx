@@ -69,6 +69,8 @@ function DropDivCard({
   category: Item[];
   toDos: ItoDos;
   index: number;
+  isDragging?: boolean;
+  isDropAnimating?: boolean;
 }) {
   const [_, settoDos] = useRecoilState(todoAtoms);
 

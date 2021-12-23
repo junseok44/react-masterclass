@@ -1,6 +1,7 @@
 import { GlobalStyle } from "./GlobalStyle";
 import {
   DragDropContext,
+  Draggable,
   Droppable,
   DroppableProps,
   DroppableProvidedProps,
@@ -13,6 +14,7 @@ import { useRecoilState } from "recoil";
 import { todoAtoms } from "./atoms";
 import DropDivCard from "./Components/DropDivCard";
 import { useEffect } from "react";
+import { DraggableBoard } from "./Components/DraggableBoard";
 
 export const Title = styled.div`
   font-size: 1.5rem;
@@ -45,6 +47,14 @@ export const DropBoxItem = styled.div<{
   min-height: 100px;
 `;
 
+const DropBoard = styled.div<{
+  droppableProps: DroppableProvidedProps;
+}>`
+  display: flex;
+  min-height: 350px;
+  background-color: black;
+`;
+
 function App() {
   const [toDos, settoDos] = useRecoilState(todoAtoms);
 
@@ -54,6 +64,29 @@ function App() {
     const { source, destination, draggableId } = args;
 
     console.log(destination?.droppableId, draggableId);
+
+    // if (
+    //   source.droppableId === "boardDrop" &&
+    //   destination?.droppableId === "boardDrop"
+    // ) {
+    //   //execute code.
+    //   return;
+    // }
+
+    if (
+      source.droppableId === "boardDrop" &&
+      destination?.droppableId === "boardDrop"
+    ) {
+      console.log("this should be filled");
+      return;
+    }
+
+    if (
+      source.droppableId === "boardDrop" &&
+      destination?.droppableId !== "boardDrop"
+    ) {
+      return;
+    }
 
     if (destination?.droppableId === "trash") {
       settoDos((currentObj) => {
@@ -132,17 +165,26 @@ function App() {
 
       <DragDropContext onDragEnd={onDragEnd}>
         <DropWrapper>
-          {Object.keys(toDos).map((categoryName, index) => {
-            return (
-              <DropDivCard
-                key={index}
-                title={Object.keys(toDos)[index]}
-                category={toDos[categoryName]}
-                toDos={toDos}
-                index={index}
-              ></DropDivCard>
-            );
-          })}
+          <Droppable droppableId="boardDrop">
+            {(provided, snapshot) => (
+              <DropBoard
+                ref={provided.innerRef}
+                droppableProps={provided.droppableProps}
+              >
+                {Object.keys(toDos).map((categoryName, index) => {
+                  return (
+                    <DraggableBoard
+                      key={index}
+                      index={index}
+                      categoryName={categoryName}
+                      toDos={toDos}
+                    ></DraggableBoard>
+                  );
+                })}
+                {provided.placeholder}
+              </DropBoard>
+            )}
+          </Droppable>
         </DropWrapper>
         <DropBox>
           <Title>Trashcan</Title>
