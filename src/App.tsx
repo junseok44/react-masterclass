@@ -1,208 +1,154 @@
-import { GlobalStyle } from "./GlobalStyle";
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DroppableProps,
-  DroppableProvidedProps,
-  DropResult,
-  ResponderProvided,
-} from "react-beautiful-dnd";
 import styled from "styled-components";
-import { Helmet } from "react-helmet";
-import { useRecoilState } from "recoil";
-import { todoAtoms } from "./atoms";
-import DropDivCard from "./Components/DropDivCard";
-import { useEffect } from "react";
-import { DraggableBoard } from "./Components/DraggableBoard";
+import {
+  m,
+  motion,
+  useMotionValue,
+  useTransform,
+  useViewportScroll,
+} from "framer-motion";
+import { useEffect, useRef } from "react";
 
-export const Title = styled.div`
-  font-size: 1.5rem;
-  text-align: center;
-  margin: 10px 0px;
-  font-weight: 600;
-`;
-
-export const DropWrapper = styled.div`
+const Wrapper = styled.div`
+  height: 300vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
+  align-items: center;
 `;
 
-export const DropBox = styled.div`
-  position: fixed;
-  bottom: 5%;
-  left: 25%;
-  width: 50%;
-  background-color: #dcdee0;
+const Box = styled(motion.div)`
+  width: 200px;
+  height: 200px;
+  background-color: transparent;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
-export const DropBoxItem = styled.div<{
-  droppableProps: DroppableProvidedProps;
-  draggingOverWith: string | undefined;
-}>`
-  background-color: ${(props) =>
-    props.draggingOverWith ? "#fab1a0" : "transparent"};
-
-  text-align: center;
-  min-height: 100px;
-`;
-
-const DropBoard = styled.div<{
-  droppableProps: DroppableProvidedProps;
-}>`
+const TitleBox = styled(motion.div)`
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
   display: flex;
-  min-height: 350px;
-  background-color: black;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 1.5rem;
+  color: black;
 `;
+
+const TitleConstraints = styled.div`
+  width: 600px;
+  height: 300px;
+  background-color: transparent;
+  border: 1px solid black;
+`;
+
+const Circle = styled(motion.div)`
+  width: 70px;
+  height: 70px;
+  align-self: center;
+  justify-self: center;
+  background-color: white;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+  border-radius: 50%;
+`;
+
+const boxVariants = {
+  start: { opacity: 0 },
+  end: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.5,
+      staggerChildren: 0.5,
+    },
+  },
+};
+
+const CircleVariants = {
+  start: { opacity: 0 },
+  end: {
+    opacity: 1,
+  },
+};
+
+const titleBoxTransition = {
+  hover: {
+    fontWeight: 700,
+    rotateX: 180,
+  },
+  click: {
+    backgroundColor: "black",
+    color: "white",
+  },
+};
+
+const SVG = styled.svg`
+  width: 200px;
+  height: 200px;
+  path : {
+    stroke: black;
+    stroke-width: 1;
+  }
+`;
+
+const SVGvariants = {
+  start: {
+    pathLength: 0,
+    fill: "rgba(255, 255, 255, 0)",
+  },
+  end: {
+    fill: "rgba(255, 255, 255, 1)",
+    pathLength: 1,
+    transition: {
+      default: { duration: 5 },
+      fill: { duration: 1, delay: 3 },
+    },
+  },
+};
 
 function App() {
-  const [toDos, settoDos] = useRecoilState(todoAtoms);
+  const Constraints = useRef<HTMLDivElement>(null);
+  const divPractice = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const returnXscale = useTransform(x, [-500, 400], [0.5, 2]);
+  const returnXrotate = useTransform(x, [-500, 400], ["0", "360deg"]);
 
-  const onDragEnd = (args: DropResult, provided: ResponderProvided) => {
-    console.log(args);
+  const { scrollX, scrollY, scrollXProgress, scrollYProgress } =
+    useViewportScroll();
 
-    const { source, destination, draggableId } = args;
-
-    console.log(destination?.droppableId, draggableId);
-
-    // if (
-    //   source.droppableId === "boardDrop" &&
-    //   destination?.droppableId === "boardDrop"
-    // ) {
-    //   //execute code.
-    //   return;
-    // }
-
-    if (
-      source.droppableId === "boardDrop" &&
-      destination?.droppableId === "boardDrop"
-    ) {
-      console.log("this should be filled");
-      return;
-    }
-
-    if (
-      source.droppableId === "boardDrop" &&
-      destination?.droppableId !== "boardDrop"
-    ) {
-      return;
-    }
-
-    if (destination?.droppableId === "trash") {
-      settoDos((currentObj) => {
-        const currentArr = [...currentObj[source.droppableId]];
-        currentArr.splice(source.index, 1);
-
-        return { ...currentObj, [source.droppableId]: currentArr };
-      });
-
-      return;
-    }
-
-    if (source.droppableId === destination?.droppableId) {
-      settoDos((currentObj) => {
-        const destName = destination.droppableId;
-        const copyObj = { ...currentObj };
-        const copyArr = [...copyObj[destName]];
-        // 뭐가 달라졌나.. 아까는 copyArr를 바로 copyObj[destname] 이라고 했는데요
-        // 그러니까 splice를 못쓰더라구요. read only property라고. 그러니까 이거는..
-        // 그래서 copyObj의 안에 value를 다시 복사해서 만들었어요
-        // 아니 근데 그러면 copyObj 만들어서 할 필요가 없다고 한다. nico의 코딩에 따르면.
-        copyArr.splice(source.index, 1);
-        copyArr.splice(destination.index, 0, {
-          text: draggableId,
-          id: Date.now(),
-        });
-
-        return { ...currentObj, [destName]: copyArr };
-      });
-    }
-
-    if (
-      source.droppableId !== destination?.droppableId &&
-      destination !== undefined &&
-      destination !== null
-    ) {
-      const startName = source.droppableId;
-      const endName = destination?.droppableId;
-
-      settoDos((currentObj) => {
-        const copyArr = [...currentObj[startName]];
-        const copyArr2 = [...currentObj[endName]];
-        copyArr.splice(source.index, 1);
-        copyArr2.splice(destination.index, 0, {
-          text: draggableId,
-          id: Date.now(),
-        });
-        return { ...currentObj, [startName]: copyArr, [endName]: copyArr2 };
-      });
-    }
-  };
+  const gradient = useTransform(
+    x,
+    [-800, 800],
+    [
+      "linear-gradient(135deg, rgb(0, 210, 238), rgb(0, 83, 238))",
+      "linear-gradient(135deg, rgb(0, 238, 155), rgb(238, 178, 0))",
+    ]
+  );
 
   useEffect(() => {
-    localStorage.setItem("thisisTOdoS", JSON.stringify(toDos));
-  }, [toDos]);
+    gradient.onChange(() => {
+      console.log(gradient.get());
+    });
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      const data = localStorage.getItem("thisisTOdos");
-      const parsedData = await JSON.parse(data || "");
-      settoDos(parsedData);
-      console.log("loaded");
+    if (divPractice.current) {
+      const target = divPractice.current;
+      target.addEventListener("click", () => {
+        console.log("hello");
+      });
     }
   }, []);
 
   return (
-    <>
-      <Helmet>
-        <title>hello</title>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap"
-          rel="stylesheet"
-        ></link>
-      </Helmet>
-      <GlobalStyle />
-
-      <DragDropContext onDragEnd={onDragEnd}>
-        <DropWrapper>
-          <Droppable droppableId="boardDrop">
-            {(provided, snapshot) => (
-              <DropBoard
-                ref={provided.innerRef}
-                droppableProps={provided.droppableProps}
-              >
-                {Object.keys(toDos).map((categoryName, index) => {
-                  return (
-                    <DraggableBoard
-                      key={index}
-                      index={index}
-                      categoryName={categoryName}
-                      toDos={toDos}
-                    ></DraggableBoard>
-                  );
-                })}
-                {provided.placeholder}
-              </DropBoard>
-            )}
-          </Droppable>
-        </DropWrapper>
-        <DropBox>
-          <Title>Trashcan</Title>
-          <Droppable droppableId="trash">
-            {(provided, snapshot) => (
-              <DropBoxItem
-                ref={provided.innerRef}
-                droppableProps={provided.droppableProps}
-                draggingOverWith={snapshot.draggingOverWith}
-              >
-                drop here to remove
-                {provided.placeholder}
-              </DropBoxItem>
-            )}
-          </Droppable>
-        </DropBox>
-      </DragDropContext>
-    </>
+    <Wrapper ref={Constraints}>
+      <div>hello</div>
+      <button>click here</button>
+    </Wrapper>
   );
 }
 
